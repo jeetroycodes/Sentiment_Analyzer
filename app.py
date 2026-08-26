@@ -63,32 +63,23 @@ print(serving_fn.structured_outputs)
 
 
 # =========================================================
-# YOUR MODEL'S INPUT NAME
-# =========================================================
-
-INPUT_NAME = "keras_tensor"
-
-print("\nUsing input name:", INPUT_NAME)
-
-
-# =========================================================
 # PREDICTION FUNCTION
 # =========================================================
 
 def predict_sentiment(review):
 
-    # Convert Python string to TensorFlow string tensor
+    # Convert review to TensorFlow string tensor
     review_tensor = tf.constant(
         [review],
         dtype=tf.string
     )
 
-    # Call the SavedModel
+    # Call the TensorFlow model
     result = serving_fn(
         keras_tensor=review_tensor
     )
 
-    # Get output tensor
+    # Get model output
     output_name = list(result.keys())[0]
 
     prediction = result[output_name]
@@ -96,22 +87,19 @@ def predict_sentiment(review):
     # Convert TensorFlow tensor to NumPy
     prediction = prediction.numpy()
 
-    # Extract probability
+    # Get probability
     probability = float(
         np.asarray(prediction).flatten()[0]
     )
 
-    # ---------------------------------------------
+    # =====================================================
     # SENTIMENT
-    # ---------------------------------------------
+    # =====================================================
 
     if probability >= 0.5:
-
         sentiment = "Positive"
         confidence = probability
-
     else:
-
         sentiment = "Negative"
         confidence = 1 - probability
 
@@ -137,10 +125,7 @@ def home():
             ""
         ).strip()
 
-        # ---------------------------------------------
-        # CHECK EMPTY INPUT
-        # ---------------------------------------------
-
+        # Check empty input
         if not review:
 
             error = "Please enter a movie review."
@@ -153,7 +138,7 @@ def home():
                     review
                 )
 
-                # Convert probability to percentage
+                # Convert to percentage
                 confidence = round(
                     confidence * 100,
                     2
@@ -187,12 +172,18 @@ if __name__ == "__main__":
     print("\n========================================")
     print("Starting Flask application...")
     print("========================================")
+
+    port = int(
+        os.environ.get("PORT", 5000)
+    )
+
     print("Open your browser:")
-    print("http://127.0.0.1:5000")
+    print(f"http://127.0.0.1:{port}")
+
     print("========================================\n")
 
     app.run(
         host="127.0.0.1",
-        port=5000,
+        port=port,
         debug=True
     )
